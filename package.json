@@ -1,0 +1,19 @@
+{
+  "name": "imchii-wi3awde-iji",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fontsource/anton": "latest",
+    "gsap": "latest"
+  },
+  "devDependencies": {
+    "sass": "latest",
+    "vite": "latest"
+  }
+}
