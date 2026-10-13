@@ -4,7 +4,15 @@ Expérience typographique réalisée avec HTML, SCSS, JavaScript natif, [Motion]
 
 « Va-t'en et reviens » : au scroll, la même phrase quitte la composition ivoire et revient, recomposée, dans l'affiche sombre. Chaque mot suit un arc, ses lettres partent avec un léger décalage, et le soleil rouge voyage avec « iji ». À mi-parcours, la nuit tombe : les mots se dissolvent, seuls le « 3 » et le soleil restent, puis tout réapparaît en ivoire. Le mouvement est lié au scroll, lissé par un ressort, et entièrement réversible.
 
-Sur les appareils avec pointeur, les lettres proches du curseur se soulèvent et s'écartent légèrement, comme des roseaux. Les appareils tactiles n'activent pas le survol ; `prefers-reduced-motion` affiche directement les deux compositions empilées, avec un simple fondu.
+À la souris ou au stylet, chaque mot joue son sens :
+
+- **Imchii** (pars) : survolé, ses lettres partent à l'horizontale le long du mot, vers le côté libre de l'écran, la lettre de tête la première et la plus loin, penchées dans le mouvement ; elles reviennent quand le curseur s'en va.
+- **wi3awde** (et encore) : tant qu'il est survolé, des échos en contour se détachent de ses lettres en cascade, encore et encore.
+- **iji** (reviens) : quand le curseur s'approche, le mot vient vers lui, lettre après lettre ; quand il s'éloigne, il rentre à sa place.
+
+Le toucher n'active pas ces effets ; `prefers-reduced-motion` affiche directement les deux compositions empilées, avec un simple fondu.
+
+Le bouton « Écouter », en bas à gauche, lance la voix enregistrée (`src/audio-imchi.mp3`, environ 18 s, lecture unique). Pendant qu'elle parle, son volume est analysé en direct avec Web Audio et le soleil grossit très légèrement à chaque syllabe ; en mouvement réduit, seul le point du bouton s'éclaire au rythme de la voix.
 
 ## Fonctionnement
 
