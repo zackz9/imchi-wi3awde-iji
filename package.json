@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@fontsource/anton": "latest",
-    "gsap": "latest"
+    "motion": "^14.1.1"
   },
   "devDependencies": {
     "sass": "latest",

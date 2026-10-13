@@ -5,7 +5,7 @@
   --color-accent: #e94b35;
   --font-display: 'Anton', Impact, sans-serif;
   --page-gutter: clamp(1.25rem, 5vw, 5rem);
-  --ease-expressive: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 @font-face {
@@ -56,27 +56,29 @@ body {
   align-items: center;
 }
 
-.scene::before,
 .scene::after {
   position: absolute;
+  z-index: 3;
+  inset: 0;
+  opacity: 0.07;
+  background-image: radial-gradient(circle, currentColor 0.45px, transparent 0.8px);
+  background-size: 6px 6px;
+  mix-blend-mode: multiply;
   pointer-events: none;
   content: '';
 }
 
-.scene::before {
-  z-index: 0;
+.scene__ink {
+  display: none;
+}
+
+.scene__sun {
+  position: absolute;
+  z-index: 1;
   aspect-ratio: 1;
   border-radius: 50%;
   background: var(--color-accent);
-}
-
-.scene::after {
-  z-index: 2;
-  inset: 0;
-  opacity: 0.1;
-  background-image: radial-gradient(circle, currentColor 0.45px, transparent 0.8px);
-  background-size: 6px 6px;
-  mix-blend-mode: multiply;
+  pointer-events: none;
 }
 
 .scene--expression {
@@ -84,21 +86,28 @@ body {
   color: var(--color-ink);
 }
 
-.scene--expression::before {
+.scene--expression .scene__sun {
   right: -3%;
   bottom: 8%;
   width: clamp(16rem, 29vw, 28rem);
 }
 
 .scene--recomposition {
+  --phrase-height: min(78svh, 58rem);
+  --phrase-size: clamp(8rem, 18vw, 19rem);
+  --iji-top: 0.06;
+  --iji-size: 0.48;
+  --sun-size: clamp(13rem, 23vw, 23rem);
   background-color: var(--color-ink);
   color: var(--color-paper);
 }
 
-.scene--recomposition::before {
-  top: 2%;
+// "iji" lands on the sun at every viewport height: the phrase is centred in the
+// scene, so the sun's top is solved from the word's position (line-height 0.82).
+.scene--recomposition .scene__sun {
+  top: calc(50% - (0.5 - var(--iji-top)) * var(--phrase-height) + 0.41 * var(--iji-size) * var(--phrase-size) - var(--sun-size) / 2);
   right: -2%;
-  width: clamp(13rem, 23vw, 23rem);
+  width: var(--sun-size);
 }
 
 .scene--recomposition::after {
@@ -107,7 +116,7 @@ body {
 
 .scene__stage {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: grid;
   width: 100%;
   min-height: min(88svh, 64rem);
@@ -119,12 +128,10 @@ body {
   width: 100%;
   min-height: min(78svh, 58rem);
   margin: 0;
-  perspective: 1100px;
   font-weight: 400;
   line-height: 0.82;
   text-wrap: nowrap;
   font-kerning: normal;
-  transform-style: preserve-3d;
 }
 
 .phrase__word {
@@ -135,15 +142,14 @@ body {
 
 .phrase__glyph {
   display: inline-block;
-  transform-origin: 50% 70%;
-  transform-style: preserve-3d;
 }
 
 .phrase__glyph-face {
   display: inline-block;
-  transform-origin: 50% 70%;
+  transform-origin: 50% 90%;
 }
 
+.phrase__accent,
 .phrase__glyph[data-glyph='3'] {
   color: var(--color-accent);
 }
@@ -170,8 +176,9 @@ body {
 }
 
 .phrase--recomposition {
+  min-height: var(--phrase-height);
   color: var(--color-paper);
-  font-size: clamp(8rem, 18vw, 19rem);
+  font-size: var(--phrase-size);
 }
 
 .phrase--recomposition .phrase__word:nth-of-type(1) {
@@ -188,13 +195,66 @@ body {
 }
 
 .phrase--recomposition .phrase__word:nth-of-type(3) {
-  top: 6%;
+  top: calc(var(--iji-top) * 100%);
   right: 5%;
-  font-size: 0.48em;
+  font-size: calc(var(--iji-size) * 1em);
 }
 
-.has-motion .scene {
-  background-color: transparent;
+// One pinned stage: the expression phrase travels into the recomposition layout,
+// which stays in the DOM only as an invisible set of target positions.
+.has-motion {
+  .experience {
+    height: 300svh;
+  }
+
+  .scene {
+    height: 100svh;
+    min-height: 0;
+  }
+
+  .scene__stage {
+    height: 100%;
+    min-height: 0;
+  }
+
+  .scene--expression {
+    position: sticky;
+    top: 0;
+  }
+
+  .scene--recomposition {
+    position: absolute;
+    inset: auto 0 0;
+    visibility: hidden;
+  }
+
+  .scene__ink {
+    position: absolute;
+    z-index: 0;
+    display: block;
+    inset: 0;
+    opacity: 0;
+    background: var(--color-ink);
+    pointer-events: none;
+  }
+
+  &.is-night,
+  &.is-night body {
+    background-color: var(--color-ink);
+  }
+
+  // Failsafe: reveal the poster if the script never takes over.
+  &:not(.is-ready) .phrase--expression,
+  &:not(.is-ready) .scene--expression .scene__sun {
+    opacity: 0;
+    animation: reveal 600ms var(--ease-out) 3s forwards;
+  }
+}
+
+@keyframes reveal {
+  to {
+    opacity: 1;
+  }
 }
 
 @media (max-width: 899px) {
@@ -227,8 +287,10 @@ body {
     font-size: 0.6em;
   }
 
-  .phrase--recomposition {
-    font-size: clamp(7rem, 16vw, 11rem);
+  .scene--recomposition {
+    --phrase-size: clamp(7rem, 16vw, 11rem);
+    --iji-top: 0.08;
+    --iji-size: 0.5;
   }
 
   .phrase--recomposition .phrase__word:nth-of-type(1) {
@@ -243,9 +305,7 @@ body {
   }
 
   .phrase--recomposition .phrase__word:nth-of-type(3) {
-    top: 8%;
     right: 7%;
-    font-size: 0.5em;
   }
 }
 
@@ -281,9 +341,10 @@ body {
     font-size: 0.63em;
   }
 
-  .phrase--recomposition {
-    min-height: 70svh;
-    font-size: clamp(5.25rem, 26vw, 7rem);
+  .scene--recomposition {
+    --phrase-height: 70svh;
+    --phrase-size: clamp(5.25rem, 26vw, 7rem);
+    --iji-top: 0.09;
   }
 
   .phrase--recomposition .phrase__word:nth-of-type(1) {
@@ -299,14 +360,17 @@ body {
   }
 
   .phrase--recomposition .phrase__word:nth-of-type(3) {
-    top: 9%;
     right: 9%;
-    font-size: 0.5em;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .phrase {
+    animation: reveal 600ms var(--ease-out) both;
+    opacity: 0;
   }
 }
