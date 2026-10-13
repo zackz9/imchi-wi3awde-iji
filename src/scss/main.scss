@@ -221,60 +221,6 @@ body {
   font-size: calc(var(--iji-size) * 1em);
 }
 
-// Listen control. `--voice` (0–1) is the recording's live loudness, set by the script.
-.sound {
-  position: fixed;
-  z-index: 4;
-  bottom: clamp(0.75rem, 3vw, 2rem);
-  left: var(--page-gutter);
-  display: inline-flex;
-  min-height: 44px;
-  padding: 0.5rem 0;
-  align-items: center;
-  gap: 0.6em;
-  border: 0;
-  background: none;
-  color: var(--color-ink);
-  font: 400 clamp(0.875rem, 1vw, 1rem) / 1 var(--font-display);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: color 200ms ease, scale 160ms var(--ease-out);
-  -webkit-tap-highlight-color: transparent;
-}
-
-.sound[hidden] {
-  display: none;
-}
-
-.sound:active {
-  scale: 0.97;
-}
-
-.sound:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 4px;
-}
-
-.sound__dot {
-  width: 0.62em;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: var(--color-accent);
-  transform: scale(calc(1 + 0.5 * var(--voice, 0)));
-  transition: scale 160ms var(--ease-out);
-}
-
-.is-night .sound {
-  color: var(--color-paper);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .sound:hover .sound__dot {
-    scale: 1.2;
-  }
-}
-
 // One pinned stage: the expression phrase travels into the recomposition layout,
 // which stays in the DOM only as an invisible set of target positions.
 .has-motion {
@@ -458,14 +404,5 @@ body {
   .phrase {
     animation: reveal 600ms var(--ease-out) both;
     opacity: 0;
-  }
-
-  // The voice shows as brightness instead of size.
-  .sound__dot {
-    transform: none;
-  }
-
-  .sound.is-playing .sound__dot {
-    opacity: calc(0.45 + 0.55 * var(--voice, 0));
   }
 }

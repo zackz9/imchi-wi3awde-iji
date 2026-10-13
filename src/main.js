@@ -66,8 +66,6 @@ const words = [...phrase.querySelectorAll('.phrase__word')];
 const ghostWords = [...ghostScene.querySelectorAll('.phrase__word')];
 const originalWords = words.map((word) => word.innerHTML);
 const themeColor = document.querySelector('meta[name="theme-color"]');
-const soundButton = document.querySelector('.sound');
-const soundLabel = soundButton.querySelector('.sound__label');
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const voiceLevel = motionValue(0);
 
@@ -495,7 +493,8 @@ function start() {
   };
 }
 
-// Static compositions: night falls when the dark one reaches the listen control.
+// Static compositions: night falls, for the browser chrome, once the dark one
+// reaches the bottom of the screen.
 function watchNight() {
   const stopWatching = inView(ghostScene, () => {
     setNight(true);
@@ -508,8 +507,10 @@ function watchNight() {
   };
 }
 
-// One listen-through of the recording; its loudness swells the sun as it speaks.
+// "Imchii" speaks: hovering or tapping the word plays the recording through once,
+// and its loudness swells the sun as it speaks.
 function bindVoice() {
+  const [goWord] = words;
   let voice;
   let context;
   let analyser;
@@ -526,8 +527,6 @@ function bindVoice() {
   };
 
   const setPlaying = (playing) => {
-    soundButton.classList.toggle('is-playing', playing);
-    soundLabel.textContent = playing ? 'Pause' : 'Écouter';
     cancelFrame(listen);
     if (playing && analyser) frame.read(listen, true);
     else animate(voiceLevel, 0, { duration: 0.2, ease: EASE_OUT });
@@ -552,18 +551,37 @@ function bindVoice() {
     }
   };
 
-  soundButton.addEventListener('click', () => {
+  // Once started, the voice runs to its end; a new visit to the word replays it.
+  const speak = () => {
     if (!voice) load();
-    if (!voice.paused) {
-      voice.pause();
-      return;
-    }
+    if (!voice.paused) return;
     context?.resume();
-    voice.play().catch(() => setPlaying(false));
-  });
+    voice.play().catch(() => {});
+  };
 
-  styleEffect(soundButton.querySelector('.sound__dot'), { '--voice': voiceLevel });
-  soundButton.hidden = false;
+  // Browsers keep a page silent until the visitor clicks, taps or presses a key on
+  // it; a hover never counts. The first such gesture anywhere unlocks the voice
+  // (Safari also wants the element itself played once inside a gesture), so every
+  // hover of "Imchii" after it can speak.
+  const unlock = (event) => {
+    if (!voice) load();
+    context?.resume();
+    // A tap on the word speaks for itself, and a voice already speaking is unlocked.
+    if (goWord.contains(event.target) || !voice.paused) return;
+    voice.muted = true;
+    voice.play().then(() => {
+      voice.pause();
+      voice.currentTime = 0;
+      voice.muted = false;
+    }, () => {
+      voice.muted = false;
+    });
+  };
+
+  window.addEventListener('pointerdown', unlock, { capture: true, once: true });
+  window.addEventListener('keydown', unlock, { capture: true, once: true });
+  goWord.addEventListener('pointerenter', speak);
+  goWord.addEventListener('pointerdown', speak);
 }
 
 let stop = null;

@@ -12,7 +12,9 @@ Expérience typographique réalisée avec HTML, SCSS, JavaScript natif, [Motion]
 
 Le toucher n'active pas ces effets ; `prefers-reduced-motion` affiche directement les deux compositions empilées, avec un simple fondu.
 
-Le bouton « Écouter », en bas à gauche, lance la voix enregistrée (`src/audio-imchi.mp3`, environ 18 s, lecture unique). Pendant qu'elle parle, son volume est analysé en direct avec Web Audio et le soleil grossit très légèrement à chaque syllabe ; en mouvement réduit, seul le point du bouton s'éclaire au rythme de la voix.
+Survoler ou toucher « Imchii » fait aussi parler la voix enregistrée (`src/audio-imchi.mp3`, environ 18 s, jouée jusqu'au bout ; un nouveau passage sur le mot la rejoue une fois finie). Pendant qu'elle parle, son volume est analysé en direct avec Web Audio et le soleil grossit très légèrement à chaque syllabe.
+
+Les navigateurs gardent une page muette tant que le visiteur n'y a pas cliqué, tapé ou appuyé sur une touche ; un survol ne suffit pas. Le premier de ces gestes, n'importe où sur la page, débloque la voix ; avant lui, le survol de « Imchii » reste silencieux, alors qu'un clic ou un tap sur le mot parle toujours.
 
 ## Fonctionnement
 
